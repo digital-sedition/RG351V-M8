@@ -64,8 +64,10 @@ make | tee /dev/tty1
 cd ..
 
 #
-# Building m8c fucky-wucky SDL2 run-time for PortMaster, so resetty-wetty it.
-# Note: if this doesn't fix things, uninstall SDL2-dev and then re-install the below run-time.
+# Building m8c fucky-wucky SDL2 run-time, so resetty-wetty it.
+# Likely a better fix for this, but this works...
+echo "-- REMOVING SDL2 DEV LIBS AND RE-INSTALLING RUN-TIME" | tee /dev/tty1
+sudo apt-get remove --assume-yes libsdl2-dev | tee /dev/tty1
 sudo apt-get --reinstall install --assume-yes libsdl2-2.0-0 | tee /dev/tty1
 
 #
@@ -76,6 +78,6 @@ fi
 
 #
 # Noice.
-echo "-- CEASE ALL PANIC ACTIONS; I THINK WE'RE GOOD" | tee /dev/tty1
+echo "-- CEASE ALL PANIC IMMEDAITELY; I THINK WE'RE GOOD!" | tee /dev/tty1
 sleep 2
 printf "\033c" >> /dev/tty1

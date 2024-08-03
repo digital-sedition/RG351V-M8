@@ -21,7 +21,7 @@ else
 fi
 
 #
-# Disable wiffy if enabled, and set CPU governor to "performance" to help minimize audio crackles...
+# Disable wiffy if enabled, and set CPU governor to "performance" (if not already) to help minimize audio crackles...
 sudo modprobe -r mt7601u
 sudo sed -i '$ablacklist mt7601u' /etc/modprobe.d/blacklist.conf
 echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
@@ -29,6 +29,7 @@ echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_gover
 #
 # Utilise auto_midi_connect to connect_midi_automatically...
 sudo python3 ./M8-START.midi_connect.py
+echo "acount found the following devices, FYI:" | tee /dev/tty1
 sudo chmod 666 /dev/tty1
 /bin/aconnect -ol > /dev/tty1
 sleep 2
