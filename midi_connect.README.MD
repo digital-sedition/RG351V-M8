@@ -1,0 +1,1 @@
+Please see https://github.com/smootalicious/auto_midi_connect

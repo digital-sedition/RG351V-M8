@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Similar theory - but different execution - to https://github.com/jasonporritt/rg351_m8c
+# This instead queries aplay for the M8's ALSA hardware ID instead of guessing.
+
+vTest=$(aplay -l|grep ": M8"|head -1|sed "0,/M8/ s/.*card //;s/\:.*//")
+vChek=$(ps aux|grep [a]lsaloop|grep -v M8-START.alsaloop)
+
+while : 
+do
+
+if [ "$vTest" = "" ]
+ then
+  sleep 1
+  vTest=$(aplay -l|grep ": M8"|head -1|sed "0,/M8/ s/.*card //;s/\:.*//")
+ else
+  if [ "$vChek" = "" ]
+   then 
+    alsaloop -P hw:0,0 -C hw:"$vTest",0 -t 200000 -A 5 --rate 44100 --sync=0 -T -1 -d
+	sleep 1
+	break
+  else
+   vChek=$(ps aux|grep [a]lsaloop|grep -v M8-START.alsaloop)
+   sleep 2
+fi
+fi
+
+done
