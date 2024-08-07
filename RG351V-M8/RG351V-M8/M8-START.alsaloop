@@ -9,12 +9,12 @@ vChek=$(ps aux|grep [a]lsaloop|grep -v M8-START.alsaloop)
 while : 
 do
 
-if [ "$vTest" = "" ]
+if [ -z "$vTest" ]
  then
   sleep 1
   vTest=$(aplay -l|grep ": M8"|head -1|sed "0,/M8/ s/.*card //;s/\:.*//")
  else
-  if [ "$vChek" = "" ]
+  if [ -z "$vChek" ]
    then 
     alsaloop -P hw:0,0 -C hw:"$vTest",0 -t 200000 -A 5 --rate 44100 --sync=0 -T -1 -d
 	sleep 1
