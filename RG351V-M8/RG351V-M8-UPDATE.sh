@@ -38,35 +38,24 @@ if [ "$tRoot" == "0" ]; then
   exit 1
 fi
 
-# ...an internet connection...
-tNet=`ip route | awk '/default/ { print $3 }'`
-if [ -z "$tNet" ]; then
-  echo "CANNOT FIND A NETWORK CONNECTION!"
-  exit 1
-fi
+sudo chmod 666 /dev/tty1
+echo "## PROP'ING UP M8C CHROOT-JAIL BUILD ENV" | tee /dev/tty1
 
 # ...and disk space!
 tDisk=$(df / | awk '/[0-9]%/{print $(NF-2)}')
 if [ "$tDisk" -le 358400 ]; then # check for space, but don't fail - can't promise this limit is enough in the future, after all!
-  echo "(POTENTIALLY) NOT ENOUGH FREE SPACE TO DO THIS...!"
-  echo "Script WILL continue unless you stop it now."
+  echo "!! <<POTENTIALLY>> NOT ENOUGH FREE SPACE TO DO THIS...!" | tee /dev/tty1
+  echo "   Script WILL continue unless you stop it now." | tee /dev/tty1
   sleep 4
 fi
 
 
 
-sudo chmod 666 /dev/tty1
-echo "## PROP'ING UP M8C CHROOT-JAIL BUILD ENV" | tee /dev/tty1
-
-
-
-#
-#
 # Can we find ourselves?
 vPTH=""
-[[ -d "/roms2/ports/RG351V-M8" ]] && vPTH="/roms2/ports/RG351V-M8" && echo "-- Found RG351V-M8 in /roms2"
-[[ -d "/roms/ports/RG351V-M8" ]] && vPTH="/roms/ports/RG351V-M8" && echo "-- Found RG351V-M8 in /roms"
-[[ -z "$vPTH" ]] && echo "!! RG351V-M8 doesn't appear to be where it should? (should be in [/roms/ports/] || [/roms2/ports/])" && exit 1
+[[ -d "/roms2/ports/RG351V-M8" ]] && vPTH="/roms2/ports/RG351V-M8" && echo "-- Found RG351V-M8 in /roms2" | tee /dev/tty1
+[[ -d "/roms/ports/RG351V-M8" ]] && vPTH="/roms/ports/RG351V-M8" && echo "-- Found RG351V-M8 in /roms" | tee /dev/tty1
+[[ -z "$vPTH" ]] && echo "!! RG351V-M8 doesn't appear to be where it should? (should be in [/roms/ports/] || [/roms2/ports/])" | tee /dev/tty1 && exit 1
 
 # Has our humble repo user slapped in a pre-/post-hook?
 [[ -e "$vPTH/M8-UPDATE1.PRE.sh" ]] && vW8T=1 && vPRE1=1
@@ -76,8 +65,6 @@ vPTH=""
 
 
 
-#
-#
 # Where we build within; seems to be issues building this in [/roms/ports/] - homedir seems fine.
 echo "" | tee /dev/tty1
 echo "-- This normally takes ~20 minutes and uses ~340M of space." | tee /dev/tty1
@@ -85,8 +72,6 @@ echo "-- Script will automatically delete all that when done though!" | tee /dev
 
 
 
-#
-#
 # Update ArkOS...
 echo "" | tee /dev/tty1
 echo ">> ArkOS apt-get update..." | tee /dev/tty1
@@ -94,8 +79,6 @@ sudo apt-get update --assume-yes | tee /dev/tty1
 
 
 
-#
-#
 # The folder(s) all of this will be captured within.
 vHOM=/home/ark
 [[ -z "$vHOM" ]] || [[ ! -d "$vHOM" ]] && echo "'ark' home folder not found?" | tee /dev/tty1 && exit 1
@@ -108,9 +91,6 @@ mkdir -p $vBLD/gaol/{bin,etc,lib,tmp,usr}
 
 
 
-#
-#
-#
 # Download all identified m8c build packages as DEB bundles.
 # These bundles will be requested against the system's architecture etc., so will match the host's requirements and should (hopefully) mean OS updates won't invalidate this.
 # If m8c dependencies change, you'll need to adjust the [ vLIB=(<list of things here>) ] line -- all the rest should still be okay.
@@ -140,9 +120,6 @@ for i in ${vLIB[@]}; do apt-get download $i | tee /dev/tty1 2>>errors.txt; done
 
 
 
-#
-#
-#
 # Okay: using the DEB bundles from above, we extract them one-by-one into the jail.
 echo "" | tee /dev/tty1
 echo ">> Setting up jail..." | tee /dev/tty1
@@ -165,17 +142,11 @@ done
 
 
 
-#
-#
-#
 # First pre-build hook for the user if wanted...
 [[ "$vPRE1" -eq 1 ]] && echo "!! RUNNING PRE-HOOK #1" | tee /dev/tty1 && $vPTH/M8-UPDATE1.PRE.sh
 
 
 
-#
-#
-#
 # Grab the actual reason why we're here, and build it...
 echo "" | tee /dev/tty1
 echo ">> Time to grab m8c and build it...!" | tee /dev/tty1
@@ -194,17 +165,11 @@ sudo chroot $vBLD/gaol ./ex.sh
 
 
 
-#
-#
-#
 # Second pre-build hook for the user if wanted...
 [[ "$vPRE2" -eq 1 ]] && echo "!! RUNNING PRE-HOOK #2" | tee /dev/tty1 && $vPTH/M8-UPDATE2.PRE.sh
 
 
 
-#
-#
-#
 # Okay, clean up, move m8c, and erase the jail...
 echo "" | tee /dev/tty1
 echo ">> Time to clean up our jail..." | tee /dev/tty1
@@ -227,17 +192,11 @@ fi
 
 
 
-#
-#
-#
 # Post-duck hook fuck.
 [[ "$vPST" -eq 1 ]] && echo "!! RUNNING POST-HOOK" | tee /dev/tty1 && $vPTH/M8-UPDATE.PST.sh
 
 
 
-#
-#
-#
 # Fin.
 # Thank you for coming to my Ted Talk.
 echo "" | tee /dev/tty1

@@ -1,8 +1,5 @@
 * text eol=lf
 
-*.ps1 text eol=crlf
-
-# Denote all files that are truly binary and should not be modified.
 *.dtb binary
-*.m8t binary
+
 *.stl binary
